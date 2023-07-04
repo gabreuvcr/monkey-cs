@@ -1,5 +1,3 @@
-using System.Security.Principal;
-
 namespace Monkey.Lexing;
 
 public class Lexer
@@ -66,7 +64,7 @@ public class Lexer
             '\0' => Token.Eof,
             _ => Token.Illegal(_ch),
         };
-        
+
         ReadChar();
         return token;
     }

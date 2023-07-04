@@ -1,7 +1,16 @@
 namespace Monkey.Lexing;
 
-public readonly record struct Token(TokenType Type, string Literal)
+public readonly record struct Token
 {
+    public readonly TokenType Type;
+    public readonly string Literal;
+    
+    private Token(TokenType type, string literal)
+    {
+        Type = type;
+        Literal = literal;
+    }
+
     public static readonly Token Equal = new(TokenType.Equal, "==");
     public static readonly Token NotEqual = new(TokenType.NotEqual, "!=");
     public static readonly Token Assign = new(TokenType.Assign, "=");
@@ -31,7 +40,7 @@ public readonly record struct Token(TokenType Type, string Literal)
     public static Token Int(string literal) => new(TokenType.Int, literal);
     public static Token Illegal(char ch) => new(TokenType.Illegal, ch.ToString());
 
-        public override readonly string ToString() {
+    public override string ToString() {
         return $"{Type}" + Type switch
         {
             TokenType.Ident or
