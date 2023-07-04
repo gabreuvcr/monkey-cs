@@ -22,7 +22,7 @@ public static class Repl
 
             Lexer lexer = new Lexer(line);
             
-            for (Token token = lexer.NextToken(); token != new Token.Eof(); token = lexer.NextToken())
+            for (Token token = lexer.NextToken(); token != Token.Eof; token = lexer.NextToken())
             {
                 Console.WriteLine(token);
             }
