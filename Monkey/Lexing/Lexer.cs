@@ -38,17 +38,17 @@ public class Lexer
                 string ident => Token.Ident(ident),
             };
         }
-        
+
         Token token = _ch switch
         {
             '=' => PeekChar() switch
             {
-                '=' => Token.Equal,
+                '=' => SkipPeek(Token.Equal),
                 _ => Token.Assign,
             },
             '!' => PeekChar() switch
             {
-                '=' => Token.NotEqual,
+                '=' => SkipPeek(Token.NotEqual),
                 _ => Token.Bang,
             },
             '-' => Token.Minus,
@@ -66,9 +66,7 @@ public class Lexer
             '\0' => Token.Eof,
             _ => Token.Illegal(_ch),
         };
-
-        if (token == Token.NotEqual || token == Token.Equal) ReadChar();
-
+        
         ReadChar();
         return token;
     }
@@ -129,5 +127,11 @@ public class Lexer
         {
             ReadChar();
         }
+    }
+
+    private Token SkipPeek(Token token)
+    {
+        ReadChar();
+        return token;
     }
 }
