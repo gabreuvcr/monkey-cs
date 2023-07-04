@@ -1,4 +1,3 @@
-﻿// See https://aka.ms/new-console-template for more information
-using Monkey.Lexing;
+﻿using Monkey.Repl;
 
-Console.WriteLine("Hello, World!");
+Repl.Start();
