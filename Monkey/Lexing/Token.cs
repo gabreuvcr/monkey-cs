@@ -31,12 +31,13 @@ public readonly record struct Token(TokenType Type, string Literal)
     public static Token Int(string literal) => new(TokenType.Int, literal);
     public static Token Illegal(char ch) => new(TokenType.Illegal, ch.ToString());
 
-    public override readonly string ToString() {
-        return $"{Type}" + 
-        (
-            this.Type is TokenType.Ident or TokenType.Int or TokenType.Illegal
-            ? $"({Literal})" 
-            : string.Empty
-        );
+        public override readonly string ToString() {
+        return $"{Type}" + Type switch
+        {
+            TokenType.Ident or
+            TokenType.Int or
+            TokenType.Illegal => $"({Literal})",
+            _ => string.Empty
+        };
     }
 }
