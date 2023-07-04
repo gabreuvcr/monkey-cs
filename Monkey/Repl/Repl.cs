@@ -20,7 +20,7 @@ public static class Repl
 
             if (line is null) { Console.WriteLine(); break; }
 
-            Lexer lexer = new Lexer(line);
+            Lexer lexer = new(line);
             
             for (Token token = lexer.NextToken(); token != Token.Eof; token = lexer.NextToken())
             {
