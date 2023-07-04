@@ -28,7 +28,7 @@ public class LexerTests
             10 != 9;
         ";
 
-        List<Token> expectedTokens = new List<Token>()
+        List<Token> expectedTokens = new()
         {
             Token.Let,
             Token.Ident("five"),
@@ -114,7 +114,7 @@ public class LexerTests
             Token.Eof,
         };
 
-        Lexer lexer = new Lexer(input);
+        Lexer lexer = new(input);
 
         foreach (Token expectedToken in expectedTokens)
         {

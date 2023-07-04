@@ -1,10 +1,8 @@
 namespace Monkey.Lexing;
 
 public enum TokenType {
-    Illegal,
-    Eof,
-    Ident,
-    Int,
+    Equal,
+    NotEqual,
     Assign,
     Plus,
     Minus,
@@ -13,8 +11,6 @@ public enum TokenType {
     Slash,
     LessThan,
     GreaterThan,
-    Equal,
-    NotEqual,
     Comma,
     Semicolon,
     LeftParen,
@@ -28,4 +24,8 @@ public enum TokenType {
     Return,
     True,
     False,
+    Eof,
+    Ident,
+    Int,
+    Illegal,
 }
