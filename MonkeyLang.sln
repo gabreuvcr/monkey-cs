@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monkey", "Monkey\Monkey.csproj", "{0FA2CF9F-DF71-4D6B-BC17-0B7A2C0144FE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{403689A2-5C7C-49F2-8BB5-FFFC91EAB66B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonkeyTests", "MonkeyTests\MonkeyTests.csproj", "{403689A2-5C7C-49F2-8BB5-FFFC91EAB66B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
