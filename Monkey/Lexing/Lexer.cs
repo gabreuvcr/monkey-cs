@@ -38,7 +38,7 @@ public class Lexer
                 string ident => Token.Ident(ident),
             };
         }
-
+        
         Token token = _ch switch
         {
             '=' => PeekChar() switch
