@@ -6,6 +6,7 @@ public static class Repl
 {
     public static void Start()
     {
+        Console.CancelKeyPress += (sender, args) => Console.WriteLine();
         Console.WriteLine("Hello! This is the Monkey programming language!");
         Console.WriteLine("Feel free to type in commands.");
         StartLoop();
@@ -18,7 +19,7 @@ public static class Repl
             Console.Write(">> ");
             string? line = Console.ReadLine();
 
-            if (line is null) { Console.WriteLine(); break; }
+            if (line is null) break;
 
             Lexer lexer = new(line);
             
@@ -27,5 +28,7 @@ public static class Repl
                 Console.WriteLine(token);
             }
         }
+
+        Console.WriteLine();
     }
 }
