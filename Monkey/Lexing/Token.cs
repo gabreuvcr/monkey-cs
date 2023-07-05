@@ -1,6 +1,10 @@
 namespace Monkey.Lexing;
 
 public enum TokenType {
+    Ident,
+    Int,
+    Illegal,
+    Eof,
     Equal,
     NotEqual,
     Assign,
@@ -24,14 +28,16 @@ public enum TokenType {
     Return,
     True,
     False,
-    Eof,
-    Ident,
-    Int,
-    Illegal,
+
+    Empty,
 }
 
 public record Token(TokenType Type, string Literal)
 {
+    public static Token Ident(string literal) => new(TokenType.Ident, literal);
+    public static Token Int(string literal) => new(TokenType.Int, literal);
+    public static Token Illegal(char ch) => new(TokenType.Illegal, ch.ToString());
+    public static Token Eof => new(TokenType.Eof, string.Empty);
     public static Token Equal => new(TokenType.Equal, "==");
     public static Token NotEqual => new(TokenType.NotEqual, "!=");
     public static Token Assign => new(TokenType.Assign, "=");
@@ -55,18 +61,15 @@ public record Token(TokenType Type, string Literal)
     public static Token Return => new(TokenType.Return, "return");
     public static Token True => new(TokenType.True, "true");
     public static Token False => new(TokenType.False, "false");
-    public static Token Eof => new(TokenType.Eof, string.Empty);
-    public static Token Ident(string literal) => new(TokenType.Ident, literal);
-    public static Token Int(string literal) => new(TokenType.Int, literal);
-    public static Token Illegal(char ch) => new(TokenType.Illegal, ch.ToString());
+    public static Token Empty => new(TokenType.Empty, string.Empty);
 
     public override string ToString() {
-        return $"{Type}" + Type switch
+        return Type switch
         {
-            TokenType.Ident or
-            TokenType.Int or
-            TokenType.Illegal => $"({Literal})",
-            _ => string.Empty
+            TokenType.Ident or 
+            TokenType.Int   or 
+            TokenType.Illegal => $"{Type}({Literal})",
+            _ => $"{Type}"
         };
     }
 }
