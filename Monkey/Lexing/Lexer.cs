@@ -64,7 +64,7 @@ public class Lexer
             '\0' => Token.Eof,
             _ => Token.Illegal(_ch),
         };
-
+        
         ReadChar();
         return token;
     }
