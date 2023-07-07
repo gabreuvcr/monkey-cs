@@ -39,7 +39,7 @@ public class IdentifierExpression : IExpression
 public class LetStatement : IStatement
 {
     public Token Token;
-    public IdentifierExpression Name ;
+    public IdentifierExpression Name;
     public IExpression? Value;
 
     public LetStatement(Token token, IdentifierExpression name)
