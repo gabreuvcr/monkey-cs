@@ -61,7 +61,6 @@ public record Token(TokenType Type, string Literal)
     public static Token Return => new(TokenType.Return, "return");
     public static Token True => new(TokenType.True, "true");
     public static Token False => new(TokenType.False, "false");
-    public static Token Empty => new(TokenType.Empty, string.Empty);
 
     public override string ToString() {
         return Type switch

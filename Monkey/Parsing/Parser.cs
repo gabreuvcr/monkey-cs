@@ -5,8 +5,8 @@ namespace Monkey.Parsing;
 public class Parser
 {
     private readonly Lexer _lexer;
-    private Token _currentToken = Token.Empty;
-    private Token _peekToken = Token.Empty;
+    private Token _currentToken = Token.Eof;
+    private Token _peekToken = Token.Eof;
     private readonly List<string> _erros = new();
 
     public Parser(Lexer lexer)
