@@ -1,5 +1,7 @@
 namespace MonkeyTests;
 
+using Xunit;
+
 using Monkey.Lexing;
 
 public class LexerTests
