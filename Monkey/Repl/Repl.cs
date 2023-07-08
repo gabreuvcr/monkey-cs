@@ -22,11 +22,16 @@ public static class Repl
             if (line is null) break;
 
             Lexer lexer = new(line);
-            
-            for (Token token = lexer.NextToken(); token != Token.Eof; token = lexer.NextToken())
+            List<Token> tokens = lexer.TokenizeProgram();
+
+            foreach (Token token in tokens) 
             {
                 Console.WriteLine(token);
             }
+            // for (Token token = lexer.NextToken(); token is not Token.Eof; token = lexer.NextToken())
+            // {
+            //     Console.WriteLine(token);
+            // }
         }
 
         Console.WriteLine();

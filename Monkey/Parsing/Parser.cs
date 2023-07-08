@@ -5,8 +5,8 @@ namespace Monkey.Parsing;
 public class Parser
 {
     private readonly Lexer _lexer;
-    private Token _currentToken = Token.Eof;
-    private Token _peekToken = Token.Eof;
+    private Token _currentToken = new Token.Eof();
+    private Token _peekToken = new Token.Eof();
     private readonly List<string> _erros = new();
 
     public Parser(Lexer lexer)
@@ -26,11 +26,11 @@ public class Parser
     {
         Ast program = new();
 
-        while (_currentToken.Type != TokenType.Eof)
+        while (_currentToken is not Token.Eof)
         {
-            IStatement? statement = _currentToken.Type switch
+            IStatement? statement = _currentToken switch
             {
-                TokenType.Let => ParseLetStatement(),
+                Token.Let => ParseLetStatement(),
                 _ => null,
             };
             if (statement != null) program.Statements.Add(statement);
@@ -42,50 +42,41 @@ public class Parser
 
     private LetStatement? ParseLetStatement()
     {
-        Token token = _currentToken;
+        Token.Let letToken = (Token.Let)_currentToken;
 
-        if (!ExpectPeek(TokenType.Ident)) return null;
+        Token.Ident? identToken = TryCastTo<Token.Ident>(_peekToken);
+        if (identToken is null) return null;
 
-        IdentifierExpression name = new(_currentToken, _currentToken.Literal);
+        IdentifierExpression name = new(identToken, identToken.Literal);
 
-        if (!ExpectPeek(TokenType.Assign)) return null;
+        if (TryCastTo<Token.Assign>(_peekToken) is null) return null;
 
-        while (!CurrentTokenIs(TokenType.Semicolon))
+        while (_currentToken is not Token.Semicolon)
         {
             NextToken();
         }
 
-        return new(token, name);
+        return new(letToken, name);
     }
 
     public IEnumerable<string> Errors => _erros.ToList();
 
-    private void PeekError(TokenType tokenType)
+    private void CastError<T>(Token peekToken)
     {
-        _erros.Add($"Expected next token to be {tokenType}, got {_peekToken} instead");
+        _erros.Add($"Expected next token to be {typeof(T)}, got {peekToken.GetType()} instead");
     }
 
-    private bool CurrentTokenIs(TokenType tokenType)
-    {
-        return _currentToken.Type == tokenType;
-    }
-
-    private bool PeekTokenIs(TokenType tokenType)
-    {
-        return _peekToken.Type == tokenType;
-    }
-
-    private bool ExpectPeek(TokenType tokenType)
-    {
-        if (PeekTokenIs(tokenType))
+    private T? TryCastTo<T>(Token token)
+    {   
+        if (token is T tokenT)
         {
             NextToken();
-            return true;
+            return tokenT;
         }
         else
         {
-            PeekError(tokenType);
-            return false;
+            CastError<T>(token);
+            return default;
         }
     }
 }

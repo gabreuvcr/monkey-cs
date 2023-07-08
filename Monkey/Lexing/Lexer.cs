@@ -1,16 +1,29 @@
 namespace Monkey.Lexing;
 
-    public class Lexer
-    {
-        private readonly string _input;
-        private int _currentPosition;
-        private int _peekPostion;
-        private char _currentChar;
+public class Lexer
+{
+    private readonly string _input;
+    private int _currentPosition;
+    private int _peekPosition;
+    private char _currentChar;
 
     public Lexer(string input)
     {
         _input = input;
         ReadChar();
+    }
+
+    public List<Token> TokenizeProgram()
+    {
+        List<Token> tokens = new();
+
+        while (_currentChar is not '\0') 
+        {
+            tokens.Add(NextToken());
+        }
+        tokens.Add(NextToken());
+
+        return tokens;
     }
 
     public Token NextToken()
@@ -19,21 +32,21 @@ namespace Monkey.Lexing;
 
         if (char.IsAsciiDigit(_currentChar)) 
         {
-            return Token.Int(ReadInteger());
+            return new Token.Int(ReadInteger());
         }
         
         if (char.IsAsciiLetter(_currentChar) || _currentChar == '_')
         {
             return ReadIdentifier() switch
             {
-                "fn" => Token.Function,
-                "let" => Token.Let,
-                "if" => Token.If,
-                "else" => Token.Else,
-                "return" => Token.Return,
-                "true" => Token.True,
-                "false" => Token.False,
-                string ident => Token.Ident(ident),
+                "fn" => new Token.Function(),
+                "let" => new Token.Let(),
+                "if" => new Token.If(),
+                "else" => new Token.Else(),
+                "return" => new Token.Return(),
+                "true" => new Token.True(),
+                "false" => new Token.False(),
+                string ident => new Token.Ident(ident),
             };
         }
 
@@ -41,28 +54,28 @@ namespace Monkey.Lexing;
         {
             '=' => PeekChar() switch
             {
-                '=' => SkipPeek(Token.Equal),
-                _ => Token.Assign,
+                '=' => SkipPeek(new Token.Equal()),
+                _ => new Token.Assign(),
             },
             '!' => PeekChar() switch
             {
-                '=' => SkipPeek(Token.NotEqual),
-                _ => Token.Bang,
+                '=' => SkipPeek(new Token.NotEqual()),
+                _ => new Token.Bang(),
             },
-            '-' => Token.Minus,
-            '+' => Token.Plus,
-            '/' => Token.Slash,
-            '*' => Token.Asterisk,
-            '<' => Token.LessThan,
-            '>' => Token.GreaterThan,
-            ';' => Token.Semicolon,
-            ',' => Token.Comma,
-            '(' => Token.LeftParen,
-            ')' => Token.RightParen,
-            '{' => Token.LeftBrace,
-            '}' => Token.RightBrace,
-            '\0' => Token.Eof,
-            _ => Token.Illegal(_currentChar),
+            '-' => new Token.Minus(),
+            '+' => new Token.Plus(),
+            '/' => new Token.Slash(),
+            '*' => new Token.Asterisk(),
+            '<' => new Token.LessThan(),
+            '>' => new Token.GreaterThan(),
+            ';' => new Token.Semicolon(),
+            ',' => new Token.Comma(),
+            '(' => new Token.LeftParen(),
+            ')' => new Token.RightParen(),
+            '{' => new Token.LeftBrace(),
+            '}' => new Token.RightBrace(),
+            '\0' => new Token.Eof(),
+            _ => new Token.Illegal(_currentChar),
         };
         
         ReadChar();
@@ -71,34 +84,35 @@ namespace Monkey.Lexing;
 
     private void ReadChar()
     {
-        if (_peekPostion >= _input.Length)
+        if (_peekPosition < _input.Length)
         {
-            _currentChar = '\0';
+            _currentChar = _input[_peekPosition];
         }
         else
         {
-            _currentChar = _input[_peekPostion];
+            _currentChar = '\0';
         }
-        _currentPosition = _peekPostion;
-        _peekPostion++;
+        
+        _currentPosition = _peekPosition;
+        _peekPosition++;
     }
 
     private char PeekChar()
     {
-        if (_peekPostion >= _input.Length)
+        if (_peekPosition < _input.Length)
         {
-            return '\0';
+            return _input[_peekPosition];
         }
         else
         {
-            return _input[_peekPostion];
+            return '\0';
         }
     }
 
     private string ReadIdentifier()
     {
         int position = _currentPosition;
-
+        
         while (char.IsAsciiLetterOrDigit(_currentChar) || _currentChar == '_')
         {
             ReadChar();
