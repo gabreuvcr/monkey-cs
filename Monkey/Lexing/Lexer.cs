@@ -3,21 +3,29 @@ namespace Monkey.Lexing;
 public class Lexer
 {
     private readonly string _input;
-    private int _currentPosition;
+    private int _currPosition;
     private int _peekPosition;
-    private char _currentChar;
+    private char CurrChar
+    {
+        get => _currPosition < _input.Length ? _input[_currPosition] : '\0';
+    } 
+    private char PeekChar
+    {
+        get => _peekPosition < _input.Length ? _input[_peekPosition] : '\0';
+    }
 
     public Lexer(string input)
     {
         _input = input;
-        ReadChar();
+        _currPosition = 0;
+        _peekPosition = 1;
     }
 
     public List<Token> TokenizeProgram()
     {
         List<Token> tokens = new();
 
-        while (_currentChar is not '\0') 
+        while (CurrChar is not '\0') 
         {
             tokens.Add(NextToken());
         }
@@ -30,12 +38,12 @@ public class Lexer
     {
         SkipWhitespace();
 
-        if (char.IsAsciiDigit(_currentChar)) 
+        if (char.IsAsciiDigit(CurrChar)) 
         {
             return new Token.Int(ReadInteger());
         }
         
-        if (char.IsAsciiLetter(_currentChar) || _currentChar == '_')
+        if (char.IsAsciiLetter(CurrChar) || CurrChar == '_')
         {
             return ReadIdentifier() switch
             {
@@ -50,14 +58,14 @@ public class Lexer
             };
         }
 
-        Token token = _currentChar switch
+        Token token = CurrChar switch
         {
-            '=' => PeekChar() switch
+            '=' => PeekChar switch
             {
                 '=' => SkipPeek(new Token.Equal()),
                 _ => new Token.Assign(),
             },
-            '!' => PeekChar() switch
+            '!' => PeekChar switch
             {
                 '=' => SkipPeek(new Token.NotEqual()),
                 _ => new Token.Bang(),
@@ -75,7 +83,7 @@ public class Lexer
             '{' => new Token.LeftBrace(),
             '}' => new Token.RightBrace(),
             '\0' => new Token.Eof(),
-            _ => new Token.Illegal(_currentChar),
+            _ => new Token.Illegal(CurrChar),
         };
         
         ReadChar();
@@ -83,59 +91,38 @@ public class Lexer
     }
 
     private void ReadChar()
-    {
-        if (_peekPosition < _input.Length)
-        {
-            _currentChar = _input[_peekPosition];
-        }
-        else
-        {
-            _currentChar = '\0';
-        }
-        
-        _currentPosition = _peekPosition;
+    {        
+        _currPosition = _peekPosition;
         _peekPosition++;
-    }
-
-    private char PeekChar()
-    {
-        if (_peekPosition < _input.Length)
-        {
-            return _input[_peekPosition];
-        }
-        else
-        {
-            return '\0';
-        }
     }
 
     private string ReadIdentifier()
     {
-        int position = _currentPosition;
+        int position = _currPosition;
         
-        while (char.IsAsciiLetterOrDigit(_currentChar) || _currentChar == '_')
+        while (char.IsAsciiLetterOrDigit(CurrChar) || CurrChar == '_')
         {
             ReadChar();
         }
 
-        return _input[position.._currentPosition];
+        return _input[position.._currPosition];
     }
 
     private string ReadInteger()
     {
-        int position = _currentPosition;
+        int position = _currPosition;
 
-        while (char.IsAsciiDigit(_currentChar))
+        while (char.IsAsciiDigit(CurrChar))
         {
             ReadChar();
         }
 
-        return _input[position.._currentPosition];
+        return _input[position.._currPosition];
     }
 
     private void SkipWhitespace()
     {
-        while (char.IsWhiteSpace(_currentChar))
+        while (char.IsWhiteSpace(CurrChar))
         {
             ReadChar();
         }

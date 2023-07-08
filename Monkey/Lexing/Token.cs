@@ -1,6 +1,6 @@
 namespace Monkey.Lexing;
 
-public record Token(string Literal)
+public abstract record Token(string Literal)
 {
     public record Ident(string Literal) : Token(Literal);
     public record Int(string Literal) : Token(Literal);
