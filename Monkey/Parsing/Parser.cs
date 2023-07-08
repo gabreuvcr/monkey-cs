@@ -4,37 +4,45 @@ namespace Monkey.Parsing;
 
 public class Parser
 {
-    private readonly Lexer _lexer;
-    private Token _currentToken = new Token.Eof();
-    private Token _peekToken = new Token.Eof();
+    private readonly List<Token> _tokens;
     private readonly List<string> _erros = new();
-
-    public Parser(Lexer lexer)
+    private int _currPosition;
+    private int _peekPosition;
+    private Token CurrToken
     {
-        _lexer = lexer;
-        NextToken();
-        NextToken();
+        get => _currPosition < _tokens.Count() ? _tokens[_currPosition] : new Token.Eof();
+    } 
+    private Token PeekToken
+    {
+        get => _peekPosition < _tokens.Count() ? _tokens[_peekPosition] : new Token.Eof();
     }
 
-    private void NextToken()
+    public Parser(List<Token> tokens)
     {
-        _currentToken = _peekToken;
-        _peekToken = _lexer.NextToken();
+        _tokens = tokens;
+        _currPosition = 0;
+        _peekPosition = 1;
+    }
+
+    private void ReadToken()
+    {
+        _currPosition = _peekPosition;
+        _peekPosition++;
     }
 
     public Ast ParseProgram()
     {
         Ast program = new();
 
-        while (_currentToken is not Token.Eof)
+        while (CurrToken is not Token.Eof)
         {
-            IStatement? statement = _currentToken switch
+            IStatement? statement = CurrToken switch
             {
                 Token.Let => ParseLetStatement(),
                 _ => null,
             };
             if (statement != null) program.Statements.Add(statement);
-            NextToken();
+            ReadToken();
         }
 
         return program;
@@ -42,18 +50,18 @@ public class Parser
 
     private LetStatement? ParseLetStatement()
     {
-        Token.Let letToken = (Token.Let)_currentToken;
+        Token.Let letToken = (Token.Let)CurrToken;
 
-        Token.Ident? identToken = TryCastTo<Token.Ident>(_peekToken);
+        Token.Ident? identToken = TryCastTo<Token.Ident>(PeekToken);
         if (identToken is null) return null;
 
         IdentifierExpression name = new(identToken, identToken.Literal);
 
-        if (TryCastTo<Token.Assign>(_peekToken) is null) return null;
+        if (TryCastTo<Token.Assign>(PeekToken) is null) return null;
 
-        while (_currentToken is not Token.Semicolon)
+        while (CurrToken is not Token.Semicolon)
         {
-            NextToken();
+            ReadToken();
         }
 
         return new(letToken, name);
@@ -70,7 +78,7 @@ public class Parser
     {   
         if (token is T tokenT)
         {
-            NextToken();
+            ReadToken();
             return tokenT;
         }
         else

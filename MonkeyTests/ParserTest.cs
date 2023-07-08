@@ -21,7 +21,8 @@ public class ParserTest
         };
 
         Lexer lexer = new(input);
-        Parser parser = new(lexer);
+        List<Token> tokens = lexer.TokenizeProgram();
+        Parser parser = new(tokens);
 
         Ast program = parser.ParseProgram();
         Assert.NotNull(program);

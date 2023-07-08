@@ -28,10 +28,6 @@ public static class Repl
             {
                 Console.WriteLine(token);
             }
-            // for (Token token = lexer.NextToken(); token is not Token.Eof; token = lexer.NextToken())
-            // {
-            //     Console.WriteLine(token);
-            // }
         }
 
         Console.WriteLine();
