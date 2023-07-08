@@ -39,6 +39,7 @@ public class Parser
             IStatement? statement = CurrToken switch
             {
                 Token.Let => ParseLetStatement(),
+                Token.Return => ParseReturnStatement(),
                 _ => null,
             };
             if (statement != null) program.Statements.Add(statement);
@@ -54,10 +55,12 @@ public class Parser
 
         Token.Ident? identToken = TryCastTo<Token.Ident>(PeekToken);
         if (identToken is null) return null;
+        ReadToken();
 
         IdentifierExpression name = new(identToken, identToken.Literal);
 
         if (TryCastTo<Token.Assign>(PeekToken) is null) return null;
+        ReadToken();
 
         while (CurrToken is not Token.Semicolon)
         {
@@ -67,18 +70,30 @@ public class Parser
         return new(letToken, name);
     }
 
+    private ReturnStatement? ParseReturnStatement()
+    {
+        Token.Return returnToken = (Token.Return)CurrToken;
+        ReadToken();
+
+        while (CurrToken is not Token.Semicolon)
+        {
+            ReadToken();
+        }
+
+        return new(returnToken, null);
+    }
+
     public IEnumerable<string> Errors => _erros.ToList();
 
     private void CastError<T>(Token peekToken)
     {
-        _erros.Add($"Expected next token to be {typeof(T)}, got {peekToken.GetType()} instead");
+        _erros.Add($"Expected next token to be {typeof(T).Name}, got {peekToken} instead");
     }
 
     private T? TryCastTo<T>(Token token)
     {   
         if (token is T tokenT)
         {
-            ReadToken();
             return tokenT;
         }
         else

@@ -50,3 +50,17 @@ public class LetStatement : IStatement
 
     public string TokenLiteral() => Token.Literal;
 }
+
+public class ReturnStatement : IStatement
+{
+    public Token Token;
+    public IExpression? Value;
+
+    public ReturnStatement(Token token, IExpression? value)
+    {
+        Token = token;
+        Value = value;
+    }
+
+    public string TokenLiteral() => Token.Literal;
+}
