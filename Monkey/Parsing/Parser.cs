@@ -6,37 +6,34 @@ public class Parser
 {
     private readonly List<Token> _tokens;
     private readonly List<string> _erros = new();
-    private int _currPosition;
-    private int _peekPosition;
-    private Token CurrToken
+    private int _position;
+    private Token CurrentToken
     {
-        get => _currPosition < _tokens.Count() ? _tokens[_currPosition] : new Token.Eof();
+        get => _position < _tokens.Count() ? _tokens[_position] : new Token.Eof();
     } 
     private Token PeekToken
     {
-        get => _peekPosition < _tokens.Count() ? _tokens[_peekPosition] : new Token.Eof();
+        get => _position + 1 < _tokens.Count() ? _tokens[_position + 1] : new Token.Eof();
     }
 
     public Parser(List<Token> tokens)
     {
         _tokens = tokens;
-        _currPosition = 0;
-        _peekPosition = 1;
+        _position = 0;
     }
 
     private void ReadToken()
     {
-        _currPosition = _peekPosition;
-        _peekPosition++;
+        _position++;
     }
 
     public Ast ParseProgram()
     {
         Ast program = new();
 
-        while (CurrToken is not Token.Eof)
+        while (CurrentToken is not Token.Eof)
         {
-            IStatement? statement = CurrToken switch
+            IStatement? statement = CurrentToken switch
             {
                 Token.Let => ParseLetStatement(),
                 Token.Return => ParseReturnStatement(),
@@ -51,7 +48,7 @@ public class Parser
 
     private LetStatement? ParseLetStatement()
     {
-        Token.Let letToken = (Token.Let)CurrToken;
+        Token.Let letToken = (Token.Let)CurrentToken;
 
         Token.Ident? identToken = TryCastTo<Token.Ident>(PeekToken);
         if (identToken is null) return null;
@@ -62,7 +59,7 @@ public class Parser
         if (TryCastTo<Token.Assign>(PeekToken) is null) return null;
         ReadToken();
 
-        while (CurrToken is not Token.Semicolon)
+        while (CurrentToken is not Token.Semicolon)
         {
             ReadToken();
         }
@@ -72,10 +69,10 @@ public class Parser
 
     private ReturnStatement? ParseReturnStatement()
     {
-        Token.Return returnToken = (Token.Return)CurrToken;
+        Token.Return returnToken = (Token.Return)CurrentToken;
         ReadToken();
 
-        while (CurrToken is not Token.Semicolon)
+        while (CurrentToken is not Token.Semicolon)
         {
             ReadToken();
         }

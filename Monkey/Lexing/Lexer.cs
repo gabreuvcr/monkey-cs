@@ -3,29 +3,27 @@ namespace Monkey.Lexing;
 public class Lexer
 {
     private readonly string _input;
-    private int _currPosition;
-    private int _peekPosition;
-    private char CurrChar
+    private int _position;
+    private char CurrentChar
     {
-        get => _currPosition < _input.Length ? _input[_currPosition] : '\0';
+        get => _position < _input.Length ? _input[_position] : '\0';
     } 
     private char PeekChar
     {
-        get => _peekPosition < _input.Length ? _input[_peekPosition] : '\0';
+        get => _position + 1 < _input.Length ? _input[_position + 1] : '\0';
     }
 
     public Lexer(string input)
     {
         _input = input;
-        _currPosition = 0;
-        _peekPosition = 1;
+        _position = 0;
     }
 
     public List<Token> TokenizeProgram()
     {
         List<Token> tokens = new();
 
-        while (CurrChar is not '\0') 
+        while (CurrentChar is not '\0') 
         {
             tokens.Add(NextToken());
         }
@@ -38,12 +36,12 @@ public class Lexer
     {
         SkipWhitespace();
 
-        if (char.IsAsciiDigit(CurrChar)) 
+        if (char.IsAsciiDigit(CurrentChar)) 
         {
             return new Token.Int(ReadInteger());
         }
         
-        if (char.IsAsciiLetter(CurrChar) || CurrChar == '_')
+        if (char.IsAsciiLetter(CurrentChar) || CurrentChar == '_')
         {
             return ReadIdentifier() switch
             {
@@ -58,7 +56,7 @@ public class Lexer
             };
         }
 
-        Token token = CurrChar switch
+        Token token = CurrentChar switch
         {
             '=' => PeekChar switch
             {
@@ -83,7 +81,7 @@ public class Lexer
             '{' => new Token.LeftBrace(),
             '}' => new Token.RightBrace(),
             '\0' => new Token.Eof(),
-            _ => new Token.Illegal(CurrChar),
+            _ => new Token.Illegal(CurrentChar),
         };
         
         ReadChar();
@@ -92,37 +90,36 @@ public class Lexer
 
     private void ReadChar()
     {        
-        _currPosition = _peekPosition;
-        _peekPosition++;
+        _position++;
     }
 
     private string ReadIdentifier()
     {
-        int position = _currPosition;
+        int position = _position;
         
-        while (char.IsAsciiLetterOrDigit(CurrChar) || CurrChar == '_')
+        while (char.IsAsciiLetterOrDigit(CurrentChar) || CurrentChar == '_')
         {
             ReadChar();
         }
 
-        return _input[position.._currPosition];
+        return _input[position.._position];
     }
 
     private string ReadInteger()
     {
-        int position = _currPosition;
+        int position = _position;
 
-        while (char.IsAsciiDigit(CurrChar))
+        while (char.IsAsciiDigit(CurrentChar))
         {
             ReadChar();
         }
 
-        return _input[position.._currPosition];
+        return _input[position.._position];
     }
 
     private void SkipWhitespace()
     {
-        while (char.IsWhiteSpace(CurrChar))
+        while (char.IsWhiteSpace(CurrentChar))
         {
             ReadChar();
         }
