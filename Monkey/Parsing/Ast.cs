@@ -119,7 +119,7 @@ public class ReturnStatement : IStatement
     }
 }
 
-public class ExpressionStatement :IStatement
+public class ExpressionStatement : IStatement
 {
     public Token Token;
     public IExpression? Expression;

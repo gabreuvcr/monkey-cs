@@ -7,7 +7,7 @@ public class Lexer
 
     private char CurrentChar =>
         _position < _input.Length ? _input[_position] : '\0';
-    
+
     private char PeekChar =>
         _position + 1 < _input.Length ? _input[_position + 1] : '\0';
 

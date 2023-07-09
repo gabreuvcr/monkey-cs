@@ -66,12 +66,12 @@ public class Parser
     {
         Token letToken = CurrentToken;
 
-        if (!IsExpected(PeekToken, TokenType.Ident)) return null;
+        if (!IsExpected(TokenType.Ident, PeekToken)) return null;
         
         ReadToken();
         IdentifierExpression name = new(CurrentToken, CurrentToken.Literal);
 
-        if (!IsExpected(PeekToken, TokenType.Assign)) return null;
+        if (!IsExpected(TokenType.Assign, PeekToken)) return null;
         
         ReadToken();
 
@@ -130,22 +130,20 @@ public class Parser
 
     public IEnumerable<string> Errors => _erros.ToList();
 
-    private void ExpectedError(TokenType type, Token peekToken)
+    private void AddError(TokenType expectedType, Token peekToken)
     {
-        _erros.Add($"Expected next token to be {type}, got {peekToken} instead");
+        _erros.Add($"Expected next token to be {expectedType}, got {peekToken} instead");
     }
 
-    private bool IsExpected(Token token, TokenType type)
+    private bool IsExpected(TokenType expectedType, Token token)
     {   
-        if (token.Type == type)
+        if (token.Type == expectedType)
         {
             return true;
         }
-        else
-        {
-            ExpectedError(type, token);
-            return false;
-        }
+        
+        AddError(expectedType, token);
+        return false;
     }
 
     private void RegisterPrefix(TokenType type, PrefixParse prefixParse)

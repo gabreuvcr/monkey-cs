@@ -11,7 +11,8 @@ public class AstTests
     public void NextToke()
     {
         Ast program = new(
-            new List<IStatement>() {
+            new List<IStatement>()
+            {
                 new LetStatement(
                     Token.Let,
                     new IdentifierExpression(
@@ -23,7 +24,7 @@ public class AstTests
                         "anotherVar"
                     )
                 )
-            }   
+            }  
         );
 
         Assert.Equal("let myVar = anotherVar;", program.ToString());
