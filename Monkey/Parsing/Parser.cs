@@ -18,7 +18,6 @@ enum PrecedenceType
 
 public class Parser
 {
-
     private readonly List<Token> _tokens;
     private int _position;
     private readonly List<string> _erros = new();
@@ -73,6 +72,7 @@ public class Parser
         IdentifierExpression name = new(CurrentToken, CurrentToken.Literal);
 
         if (!IsExpected(PeekToken, TokenType.Assign)) return null;
+        
         ReadToken();
 
         while (CurrentToken.Type is not TokenType.Semicolon)
@@ -86,6 +86,7 @@ public class Parser
     private ReturnStatement? ParseReturnStatement()
     {
         Token returnToken = CurrentToken;
+        
         ReadToken();
 
         while (CurrentToken.Type is not TokenType.Semicolon)
@@ -98,8 +99,10 @@ public class Parser
 
     private ExpressionStatement? ParseExpressionStatement()
     {
-        ExpressionStatement expressionStatement = 
-            new(CurrentToken, ParseExpression(PrecedenceType.Lowest));
+        ExpressionStatement expressionStatement = new(
+            CurrentToken, 
+            ParseExpression(PrecedenceType.Lowest)
+        );
 
         if (PeekToken.Type is TokenType.Semicolon)
         {
