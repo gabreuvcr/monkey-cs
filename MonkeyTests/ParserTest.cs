@@ -73,4 +73,32 @@ public class ParserTest
             Assert.Equal(TokenType.Return, returnStatement.Token.Type);
         }
     }
+
+    [Fact]
+    public void ParsingIdentifierExpression()
+    {
+        string input = "foobar";
+
+        Lexer lexer = new(input);
+        List<Token> tokens = lexer.TokenizeProgram();
+        Parser parser = new(tokens);
+        Ast program = parser.ParseProgram();
+        
+        Assert.NotNull(program);
+        Assert.False(
+            parser.Errors.Any(), 
+            string.Join("\n".PadRight(4), parser.Errors)
+        );
+        Assert.Single(program.Statements);
+        
+        IStatement statement = program.Statements[0];
+        ExpressionStatement expressionStatement = 
+            Assert.IsType<ExpressionStatement>(statement);
+
+        IdentifierExpression identifierExpression = 
+            Assert.IsType<IdentifierExpression>(expressionStatement.Expression);
+
+        Assert.Equal("foobar", identifierExpression.Value);
+        Assert.Equal("foobar", identifierExpression.TokenLiteral());
+    }
 }
