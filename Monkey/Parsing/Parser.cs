@@ -9,11 +9,11 @@ public class Parser
     private int _position;
     private Token CurrentToken
     {
-        get => _position < _tokens.Count() ? _tokens[_position] : new Token.Eof();
+        get => _position < _tokens.Count() ? _tokens[_position] : Token.Eof;
     } 
     private Token PeekToken
     {
-        get => _position + 1 < _tokens.Count() ? _tokens[_position + 1] : new Token.Eof();
+        get => _position + 1 < _tokens.Count() ? _tokens[_position + 1] : Token.Eof;
     }
 
     public Parser(List<Token> tokens)
@@ -31,12 +31,12 @@ public class Parser
     {
         Ast program = new();
 
-        while (CurrentToken is not Token.Eof)
+        while (CurrentToken.Type is not TokenType.Eof)
         {
-            IStatement? statement = CurrentToken switch
+            IStatement? statement = CurrentToken.Type switch
             {
-                Token.Let => ParseLetStatement(),
-                Token.Return => ParseReturnStatement(),
+                TokenType.Let => ParseLetStatement(),
+                TokenType.Return => ParseReturnStatement(),
                 _ => null,
             };
             if (statement != null) program.Statements.Add(statement);
@@ -48,31 +48,31 @@ public class Parser
 
     private LetStatement? ParseLetStatement()
     {
-        Token.Let letToken = (Token.Let)CurrentToken;
+        Token letToken = CurrentToken;
 
-        Token.Ident? identToken = TryCastTo<Token.Ident>(PeekToken);
+        Token? identToken = Expected(PeekToken, TokenType.Ident);
         if (identToken is null) return null;
         ReadToken();
 
         IdentifierExpression name = new(identToken, identToken.Literal);
 
-        if (TryCastTo<Token.Assign>(PeekToken) is null) return null;
+        if (Expected(PeekToken, TokenType.Assign) is null) return null;
         ReadToken();
 
-        while (CurrentToken is not Token.Semicolon)
+        while (CurrentToken.Type is not TokenType.Semicolon)
         {
             ReadToken();
         }
 
-        return new(letToken, name);
+        return new(letToken, name, null);
     }
 
     private ReturnStatement? ParseReturnStatement()
     {
-        Token.Return returnToken = (Token.Return)CurrentToken;
+        Token returnToken = CurrentToken;
         ReadToken();
 
-        while (CurrentToken is not Token.Semicolon)
+        while (CurrentToken.Type is not TokenType.Semicolon)
         {
             ReadToken();
         }
@@ -82,21 +82,21 @@ public class Parser
 
     public IEnumerable<string> Errors => _erros.ToList();
 
-    private void CastError<T>(Token peekToken)
+    private void ExpectedError(TokenType type, Token peekToken)
     {
-        _erros.Add($"Expected next token to be {typeof(T).Name}, got {peekToken} instead");
+        _erros.Add($"Expected next token to be {type}, got {peekToken} instead");
     }
 
-    private T? TryCastTo<T>(Token token)
+    private Token? Expected(Token token, TokenType type)
     {   
-        if (token is T tokenT)
+        if (token.Type == type)
         {
-            return tokenT;
+            return token;
         }
         else
         {
-            CastError<T>(token);
-            return default;
+            ExpectedError(type, token);
+            return null;
         }
     }
 }

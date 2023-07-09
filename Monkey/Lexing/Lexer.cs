@@ -38,21 +38,21 @@ public class Lexer
 
         if (char.IsAsciiDigit(CurrentChar)) 
         {
-            return new Token.Int(ReadInteger());
+            return Token.Int(ReadInteger());
         }
         
         if (char.IsAsciiLetter(CurrentChar) || CurrentChar == '_')
         {
             return ReadIdentifier() switch
             {
-                "fn" => new Token.Function(),
-                "let" => new Token.Let(),
-                "if" => new Token.If(),
-                "else" => new Token.Else(),
-                "return" => new Token.Return(),
-                "true" => new Token.True(),
-                "false" => new Token.False(),
-                string ident => new Token.Ident(ident),
+                "fn" => Token.Function,
+                "let" => Token.Let,
+                "if" => Token.If,
+                "else" => Token.Else,
+                "return" => Token.Return,
+                "true" => Token.True,
+                "false" => Token.False,
+                string ident => Token.Ident(ident),
             };
         }
 
@@ -60,28 +60,28 @@ public class Lexer
         {
             '=' => PeekChar switch
             {
-                '=' => SkipPeek(new Token.Equal()),
-                _ => new Token.Assign(),
+                '=' => SkipPeek(Token.Equal),
+                _ => Token.Assign,
             },
             '!' => PeekChar switch
             {
-                '=' => SkipPeek(new Token.NotEqual()),
-                _ => new Token.Bang(),
+                '=' => SkipPeek(Token.NotEqual),
+                _ => Token.Bang,
             },
-            '-' => new Token.Minus(),
-            '+' => new Token.Plus(),
-            '/' => new Token.Slash(),
-            '*' => new Token.Asterisk(),
-            '<' => new Token.LessThan(),
-            '>' => new Token.GreaterThan(),
-            ';' => new Token.Semicolon(),
-            ',' => new Token.Comma(),
-            '(' => new Token.LeftParen(),
-            ')' => new Token.RightParen(),
-            '{' => new Token.LeftBrace(),
-            '}' => new Token.RightBrace(),
-            '\0' => new Token.Eof(),
-            _ => new Token.Illegal(CurrentChar),
+            '-' => Token.Minus,
+            '+' => Token.Plus,
+            '/' => Token.Slash,
+            '*' => Token.Asterisk,
+            '<' => Token.LessThan,
+            '>' => Token.GreaterThan,
+            ';' => Token.Semicolon,
+            ',' => Token.Comma,
+            '(' => Token.LeftParen,
+            ')' => Token.RightParen,
+            '{' => Token.LeftBrace,
+            '}' => Token.RightBrace,
+            '\0' => Token.Eof,
+            _ => Token.Illegal(CurrentChar),
         };
         
         ReadChar();
