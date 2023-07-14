@@ -24,19 +24,18 @@ public class Parser
     private readonly Dictionary<TokenType, PrefixParse> _prefixParseFns = new();
     private readonly Dictionary<TokenType, InfixParse> _infixParseFns = new();
     
-    private Token CurrentToken =>
-        _position < _tokens.Count() ? _tokens[_position] : Token.Eof;
-
-    private Token PeekToken => 
-        _position + 1 < _tokens.Count() ? _tokens[_position + 1] : Token.Eof;
-
-
     public Parser(List<Token> tokens)
     {
         _tokens = tokens;
         _position = 0;
         RegisterPrefix(TokenType.Ident, ParseIdentifierExpression);
     }
+    
+    private Token CurrentToken =>
+        _position < _tokens.Count() ? _tokens[_position] : Token.Eof;
+
+    private Token PeekToken => 
+        _position + 1 < _tokens.Count() ? _tokens[_position + 1] : Token.Eof;
 
     private void ReadToken()
     {
