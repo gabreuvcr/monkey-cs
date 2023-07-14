@@ -1,4 +1,4 @@
-namespace MonkeyTests;
+namespace Monkey.Tests;
 
 using Xunit;
 
