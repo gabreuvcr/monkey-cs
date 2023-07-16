@@ -2,7 +2,7 @@ using Monkey.Lexing;
 
 namespace Monkey.Parsing;
 
-using PrefixParse = Func<IExpression>;
+using PrefixParse = Func<IExpression?>;
 using InfixParse = Func<IExpression, IExpression>;
 
 enum PrecedenceType
@@ -29,6 +29,7 @@ public class Parser
         _tokens = tokens;
         _position = 0;
         RegisterPrefix(TokenType.Ident, ParseIdentifierExpression);
+        RegisterPrefix(TokenType.Int, ParseIntegerExpression);
     }
     
     private Token CurrentToken =>
@@ -117,7 +118,7 @@ public class Parser
         
         if (prefix is null) return null;
 
-        IExpression leftExpression = prefix();
+        IExpression? leftExpression = prefix();
 
         return leftExpression;
     }
@@ -127,12 +128,22 @@ public class Parser
         return new IdentifierExpression(CurrentToken, CurrentToken.Literal);
     }
 
-    public IEnumerable<string> Errors => _erros.ToList();
-
-    private void AddError(TokenType expectedType, Token peekToken)
+    private IExpression? ParseIntegerExpression()
     {
-        _erros.Add($"Expected next token to be {expectedType}, got {peekToken} instead");
+        long value;
+        try
+        {
+            value = long.Parse(CurrentToken.Literal);
+        }
+        catch (Exception)
+        {
+            _erros.Add($"Could not parse {CurrentToken.Literal} as integer");
+            return null;
+        }
+        return new IntegerExpression(CurrentToken, value);
     }
+
+    public IEnumerable<string> Errors => _erros.ToList();
 
     private bool IsExpected(TokenType expectedType, Token token)
     {   
@@ -141,7 +152,7 @@ public class Parser
             return true;
         }
         
-        AddError(expectedType, token);
+        _erros.Add($"Expected next token to be {expectedType}, got {token} instead");
         return false;
     }
 

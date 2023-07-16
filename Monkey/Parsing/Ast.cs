@@ -59,6 +59,22 @@ public class IdentifierExpression : IExpression
     public override string ToString() => Value;
 }
 
+public class IntegerExpression : IExpression
+{
+    public Token Token;
+    public long Value;
+
+    public IntegerExpression(Token token, long value)
+    {
+        Token = token;
+        Value = value;
+    }
+
+    public string TokenLiteral() => Token.Literal;
+
+    public override string ToString() => Token.Literal;
+}
+
 public class LetStatement : IStatement
 {
     public Token Token;
