@@ -129,4 +129,44 @@ public class ParserTest
         Assert.Equal(5, integerExpression.Value);
         Assert.Equal("5", integerExpression.TokenLiteral());
     }
+
+    [Fact]
+    public void ParsingPrefixExpression()
+    {
+        List<(string, string, long)> prefixTests = new()
+        {
+            ("!5;", "!", 5),
+            ("-15;", "-", 15),
+        };
+
+        foreach ((string input, string op, long value) in prefixTests)
+        {
+            Lexer lexer = new(input);
+            List<Token> tokens = lexer.TokenizeProgram();
+            Parser parser = new(tokens);
+            Ast program = parser.ParseProgram();
+            
+            Assert.NotNull(program);
+            Assert.False(
+                parser.Errors.Any(), 
+                string.Join("\n".PadRight(4), parser.Errors)
+            );
+            Assert.Single(program.Statements);
+            
+            IStatement statement = program.Statements[0];
+            ExpressionStatement expressionStatement = 
+                Assert.IsType<ExpressionStatement>(statement);
+
+            PrefixExpression prefixExpression = 
+                Assert.IsType<PrefixExpression>(expressionStatement.Expression);
+
+            Assert.Equal(op, prefixExpression.Operator);
+
+            IntegerExpression integerExpression = 
+                Assert.IsType<IntegerExpression>(prefixExpression.Right);
+
+            Assert.Equal(value, integerExpression.Value);
+            Assert.Equal(value.ToString(), integerExpression.TokenLiteral());
+        }
+    }
 }

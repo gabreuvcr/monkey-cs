@@ -75,6 +75,34 @@ public class IntegerExpression : IExpression
     public override string ToString() => Token.Literal;
 }
 
+public class PrefixExpression : IExpression
+{
+    public Token Token;
+    public string Operator;
+    public IExpression? Right;
+
+    public PrefixExpression(Token token, string op, IExpression? right)
+    {
+        Token = token;
+        Operator = op;
+        Right = right;
+    }
+
+    public string TokenLiteral() => Token.Literal;
+
+    public override string ToString()
+    {
+        StringBuilder sb = new();
+
+        sb.Append("(");
+        sb.Append(Operator);
+        sb.Append(Right?.ToString());
+        sb.Append(")");
+
+        return sb.ToString();
+    }
+}
+
 public class LetStatement : IStatement
 {
     public Token Token;

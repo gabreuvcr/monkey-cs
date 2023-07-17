@@ -30,6 +30,8 @@ public class Parser
         _position = 0;
         RegisterPrefix(TokenType.Ident, ParseIdentifierExpression);
         RegisterPrefix(TokenType.Int, ParseIntegerExpression);
+        RegisterPrefix(TokenType.Bang, ParsePrefixExpression);
+        RegisterPrefix(TokenType.Minus, ParsePrefixExpression);
     }
     
     private Token CurrentToken =>
@@ -116,7 +118,11 @@ public class Parser
     {
         PrefixParse? prefix = _prefixParseFns.GetValueOrDefault(CurrentToken.Type);
         
-        if (prefix is null) return null;
+        if (prefix is null)
+        {
+            _erros.Add($"No prefix parse function for {CurrentToken.Type} found");
+            return null;
+        } 
 
         IExpression? leftExpression = prefix();
 
@@ -141,6 +147,19 @@ public class Parser
             return null;
         }
         return new IntegerExpression(CurrentToken, value);
+    }
+
+    private IExpression ParsePrefixExpression()
+    {
+        Token prefixToken = CurrentToken;
+
+        ReadToken();
+        
+        return new PrefixExpression(
+            prefixToken,
+            prefixToken.Literal,
+            ParseExpression(PrecedenceType.Prefix)
+        );
     }
 
     public IEnumerable<string> Errors => _erros.ToList();
