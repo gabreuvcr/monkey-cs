@@ -5,7 +5,7 @@ namespace Monkey.Parsing;
 using PrefixParse = Func<IExpression?>;
 using InfixParse = Func<IExpression, IExpression>;
 
-enum PrecedenceType
+enum Precedence
 {
     Lowest,
     Equals,
@@ -103,7 +103,7 @@ public class Parser
     {
         ExpressionStatement expressionStatement = new(
             CurrentToken, 
-            ParseExpression(PrecedenceType.Lowest)
+            ParseExpression(Precedence.Lowest)
         );
 
         if (PeekToken is SemicolonToken)
@@ -114,7 +114,7 @@ public class Parser
         return expressionStatement;
     }
 
-    private IExpression? ParseExpression(PrecedenceType precedenceType)
+    private IExpression? ParseExpression(Precedence precedence)
     {
         PrefixParse? prefix = _prefixParseFns.GetValueOrDefault(CurrentToken.GetType());
         
@@ -158,7 +158,7 @@ public class Parser
         return new PrefixExpression(
             prefixToken,
             prefixToken.Literal,
-            ParseExpression(PrecedenceType.Prefix)
+            ParseExpression(Precedence.Prefix)
         );
     }
 
