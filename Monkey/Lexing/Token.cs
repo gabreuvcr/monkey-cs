@@ -8,8 +8,8 @@ public abstract record Token(string Literal)
         {
             IdentToken
             or IntToken 
-            or IllegalToken => $"{this.GetType().Name}({Literal})",
-            _ => $"{this.GetType().Name}",
+            or IllegalToken => $"{GetType().Name}({Literal})",
+            _ => $"{GetType().Name}",
         };
     }
 }
