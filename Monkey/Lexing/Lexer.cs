@@ -36,21 +36,21 @@ public class Lexer
 
         if (char.IsAsciiDigit(CurrentChar))
         {
-            return Tokens.Int(ReadInteger());
+            return new IntToken(ReadInteger());
         }
 
         if (char.IsAsciiLetter(CurrentChar) || CurrentChar == '_')
         {
             return ReadIdentifier() switch
             {
-                "fn" => Tokens.Function,
-                "let" => Tokens.Let,
-                "if" => Tokens.If,
-                "else" => Tokens.Else,
-                "return" => Tokens.Return,
-                "true" => Tokens.True,
-                "false" => Tokens.False,
-                string ident => Tokens.Ident(ident),
+                "fn" => new FunctionToken(),
+                "let" => new LetToken(),
+                "if" => new IfToken(),
+                "else" => new ElseToken(),
+                "return" => new ReturnToken(),
+                "true" => new TrueToken(),
+                "false" => new FalseToken(),
+                string ident => new IdentToken(ident),
             };
         }
 
@@ -58,28 +58,28 @@ public class Lexer
         {
             '=' => PeekChar switch
             {
-                '=' => SkipPeek(Tokens.Equal),
-                _ => Tokens.Assign,
+                '=' => SkipPeek(new EqualToken()),
+                _ => new AssignToken(),
             },
             '!' => PeekChar switch
             {
-                '=' => SkipPeek(Tokens.NotEqual),
-                _ => Tokens.Bang,
+                '=' => SkipPeek(new NotEqualToken()),
+                _ => new BangToken(),
             },
-            '-' => Tokens.Minus,
-            '+' => Tokens.Plus,
-            '/' => Tokens.Slash,
-            '*' => Tokens.Asterisk,
-            '<' => Tokens.LessThan,
-            '>' => Tokens.GreaterThan,
-            ';' => Tokens.Semicolon,
-            ',' => Tokens.Comma,
-            '(' => Tokens.LeftParen,
-            ')' => Tokens.RightParen,
-            '{' => Tokens.LeftBrace,
-            '}' => Tokens.RightBrace,
-            '\0' => Tokens.Eof,
-            _ => Tokens.Illegal(CurrentChar),
+            '-' => new MinusToken(),
+            '+' => new PlusToken(),
+            '/' => new SlashToken(),
+            '*' => new AsteriskToken(),
+            '<' => new LessThanToken(),
+            '>' => new GreaterThanToken(),
+            ';' => new SemicolonToken(),
+            ',' => new CommaToken(),
+            '(' => new LeftParenToken(),
+            ')' => new RightParenToken(),
+            '{' => new LeftBraceToken(),
+            '}' => new RightBraceToken(),
+            '\0' => new EofToken(),
+            _ => new IllegalToken(CurrentChar),
         };
 
         ReadChar();

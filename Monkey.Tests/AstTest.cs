@@ -14,13 +14,13 @@ public class AstTests
             new List<IStatement>()
             {
                 new LetStatement(
-                    Tokens.Let,
+                    new LetToken(),
                     new IdentifierExpression(
-                        Tokens.Ident("myVar"),
+                        new IdentToken("myVar"),
                         "myVar"
                     ),
                     new IdentifierExpression(
-                        Tokens.Ident("anotherVar"),
+                        new IdentToken("anotherVar"),
                         "anotherVar"
                     )
                 )

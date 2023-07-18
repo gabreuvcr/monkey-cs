@@ -28,17 +28,17 @@ public class Parser
     {
         _tokens = tokens;
         _position = 0;
-        RegisterPrefix(typeof(Ident), ParseIdentifierExpression);
-        RegisterPrefix(typeof(Int), ParseIntegerExpression);
-        RegisterPrefix(typeof(Bang), ParsePrefixExpression);
-        RegisterPrefix(typeof(Minus), ParsePrefixExpression);
+        RegisterPrefix(typeof(IdentToken), ParseIdentifierExpression);
+        RegisterPrefix(typeof(IntToken), ParseIntegerExpression);
+        RegisterPrefix(typeof(BangToken), ParsePrefixExpression);
+        RegisterPrefix(typeof(MinusToken), ParsePrefixExpression);
     }
     
     private Token CurrentToken =>
-        _position < _tokens.Count() ? _tokens[_position] : Tokens.Eof;
+        _position < _tokens.Count() ? _tokens[_position] : new EofToken();
 
     private Token PeekToken => 
-        _position + 1 < _tokens.Count() ? _tokens[_position + 1] : Tokens.Eof;
+        _position + 1 < _tokens.Count() ? _tokens[_position + 1] : new EofToken();
 
     private void ReadToken()
     {
@@ -49,12 +49,12 @@ public class Parser
     {
         Ast program = new();
 
-        while (CurrentToken is not Eof)
+        while (CurrentToken is not EofToken)
         {
             IStatement? statement = CurrentToken switch
             {
-                Let => ParseLetStatement(),
-                Return => ParseReturnStatement(),
+                LetToken => ParseLetStatement(),
+                ReturnToken => ParseReturnStatement(),
                 _ => ParseExpressionStatement(),
             };
             if (statement != null) program.Statements.Add(statement);
@@ -68,16 +68,16 @@ public class Parser
     {
         Token letToken = CurrentToken;
 
-        if (!IsToken<Ident>(PeekToken)) return null;
+        if (!IsToken<IdentToken>(PeekToken)) return null;
         
         ReadToken();
         IdentifierExpression name = new(CurrentToken, CurrentToken.Literal);
 
-        if (!IsToken<Assign>(PeekToken)) return null;
+        if (!IsToken<AssignToken>(PeekToken)) return null;
         
         ReadToken();
 
-        while (CurrentToken is not Semicolon)
+        while (CurrentToken is not SemicolonToken)
         {
             ReadToken();
         }
@@ -91,7 +91,7 @@ public class Parser
         
         ReadToken();
 
-        while (CurrentToken is not Semicolon)
+        while (CurrentToken is not SemicolonToken)
         {
             ReadToken();
         }
@@ -106,7 +106,7 @@ public class Parser
             ParseExpression(PrecedenceType.Lowest)
         );
 
-        if (PeekToken is Semicolon)
+        if (PeekToken is SemicolonToken)
         {
             ReadToken();
         }
