@@ -38,8 +38,8 @@ public class ParserTest
             string expectedIdentifier = expectedIdentifiers[i];
 
             LetStatement letStatement = Assert.IsType<LetStatement>(statement);
-            Assert.Equal(TokenType.Let, letStatement.Token.Type);
-            Assert.Equal(TokenType.Ident, letStatement.Name.Token.Type);
+            Assert.IsType<Let>(letStatement.Token);
+            Assert.IsType<Ident>(letStatement.Name.Token);
             Assert.Equal(expectedIdentifier, letStatement.Name.Value);
             Assert.Equal(expectedIdentifier, letStatement.Name.TokenLiteral());
 
@@ -70,7 +70,7 @@ public class ParserTest
         foreach (IStatement statement in program.Statements)
         {
             ReturnStatement returnStatement = Assert.IsType<ReturnStatement>(statement);
-            Assert.Equal(TokenType.Return, returnStatement.Token.Type);
+            Assert.IsType<Return>(returnStatement.Token);
         }
     }
 

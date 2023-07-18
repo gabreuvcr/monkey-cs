@@ -21,24 +21,24 @@ public class Parser
     private readonly List<Token> _tokens;
     private int _position;
     private readonly List<string> _erros = new();
-    private readonly Dictionary<TokenType, PrefixParse> _prefixParseFns = new();
-    private readonly Dictionary<TokenType, InfixParse> _infixParseFns = new();
+    private readonly Dictionary<Type, PrefixParse> _prefixParseFns = new();
+    private readonly Dictionary<Type, InfixParse> _infixParseFns = new();
     
     public Parser(List<Token> tokens)
     {
         _tokens = tokens;
         _position = 0;
-        RegisterPrefix(TokenType.Ident, ParseIdentifierExpression);
-        RegisterPrefix(TokenType.Int, ParseIntegerExpression);
-        RegisterPrefix(TokenType.Bang, ParsePrefixExpression);
-        RegisterPrefix(TokenType.Minus, ParsePrefixExpression);
+        RegisterPrefix(typeof(Ident), ParseIdentifierExpression);
+        RegisterPrefix(typeof(Int), ParseIntegerExpression);
+        RegisterPrefix(typeof(Bang), ParsePrefixExpression);
+        RegisterPrefix(typeof(Minus), ParsePrefixExpression);
     }
     
     private Token CurrentToken =>
-        _position < _tokens.Count() ? _tokens[_position] : Token.Eof;
+        _position < _tokens.Count() ? _tokens[_position] : Tokens.Eof;
 
     private Token PeekToken => 
-        _position + 1 < _tokens.Count() ? _tokens[_position + 1] : Token.Eof;
+        _position + 1 < _tokens.Count() ? _tokens[_position + 1] : Tokens.Eof;
 
     private void ReadToken()
     {
@@ -49,12 +49,12 @@ public class Parser
     {
         Ast program = new();
 
-        while (CurrentToken.Type is not TokenType.Eof)
+        while (CurrentToken is not Eof)
         {
-            IStatement? statement = CurrentToken.Type switch
+            IStatement? statement = CurrentToken switch
             {
-                TokenType.Let => ParseLetStatement(),
-                TokenType.Return => ParseReturnStatement(),
+                Let => ParseLetStatement(),
+                Return => ParseReturnStatement(),
                 _ => ParseExpressionStatement(),
             };
             if (statement != null) program.Statements.Add(statement);
@@ -68,16 +68,16 @@ public class Parser
     {
         Token letToken = CurrentToken;
 
-        if (!IsExpected(TokenType.Ident, PeekToken)) return null;
+        if (!IsToken<Ident>(PeekToken)) return null;
         
         ReadToken();
         IdentifierExpression name = new(CurrentToken, CurrentToken.Literal);
 
-        if (!IsExpected(TokenType.Assign, PeekToken)) return null;
+        if (!IsToken<Assign>(PeekToken)) return null;
         
         ReadToken();
 
-        while (CurrentToken.Type is not TokenType.Semicolon)
+        while (CurrentToken is not Semicolon)
         {
             ReadToken();
         }
@@ -91,7 +91,7 @@ public class Parser
         
         ReadToken();
 
-        while (CurrentToken.Type is not TokenType.Semicolon)
+        while (CurrentToken is not Semicolon)
         {
             ReadToken();
         }
@@ -106,7 +106,7 @@ public class Parser
             ParseExpression(PrecedenceType.Lowest)
         );
 
-        if (PeekToken.Type is TokenType.Semicolon)
+        if (PeekToken is Semicolon)
         {
             ReadToken();
         }
@@ -116,11 +116,11 @@ public class Parser
 
     private IExpression? ParseExpression(PrecedenceType precedenceType)
     {
-        PrefixParse? prefix = _prefixParseFns.GetValueOrDefault(CurrentToken.Type);
+        PrefixParse? prefix = _prefixParseFns.GetValueOrDefault(CurrentToken.GetType());
         
         if (prefix is null)
         {
-            _erros.Add($"No prefix parse function for {CurrentToken.Type} found");
+            _erros.Add($"No prefix parse function for {CurrentToken.GetType().Name} found");
             return null;
         } 
 
@@ -164,23 +164,23 @@ public class Parser
 
     public IEnumerable<string> Errors => _erros.ToList();
 
-    private bool IsExpected(TokenType expectedType, Token token)
+    private bool IsToken<T>(Token token)
     {   
-        if (token.Type == expectedType)
+        if (token is T)
         {
             return true;
         }
         
-        _erros.Add($"Expected next token to be {expectedType}, got {token} instead");
+        _erros.Add($"Expected next token to be {typeof(T).Name}, got {token} instead");
         return false;
     }
 
-    private void RegisterPrefix(TokenType type, PrefixParse prefixParse)
+    private void RegisterPrefix(Type type, PrefixParse prefixParse)
     {
         _prefixParseFns.Add(type, prefixParse);
     }
     
-    private void RegisterInfix(TokenType type, InfixParse infixParse)
+    private void RegisterInfix(Type type, InfixParse infixParse)
     {
         _infixParseFns.Add(type, infixParse);
     }

@@ -10,7 +10,7 @@ public class Lexer
         _input = input;
         _position = 0;
     }
-    
+
     private char CurrentChar =>
         _position < _input.Length ? _input[_position] : '\0';
 
@@ -21,7 +21,7 @@ public class Lexer
     {
         List<Token> tokens = new();
 
-        while (CurrentChar is not '\0') 
+        while (CurrentChar is not '\0')
         {
             tokens.Add(NextToken());
         }
@@ -34,23 +34,23 @@ public class Lexer
     {
         SkipWhitespace();
 
-        if (char.IsAsciiDigit(CurrentChar)) 
+        if (char.IsAsciiDigit(CurrentChar))
         {
-            return Token.Int(ReadInteger());
+            return Tokens.Int(ReadInteger());
         }
-        
+
         if (char.IsAsciiLetter(CurrentChar) || CurrentChar == '_')
         {
             return ReadIdentifier() switch
             {
-                "fn" => Token.Function,
-                "let" => Token.Let,
-                "if" => Token.If,
-                "else" => Token.Else,
-                "return" => Token.Return,
-                "true" => Token.True,
-                "false" => Token.False,
-                string ident => Token.Ident(ident),
+                "fn" => Tokens.Function,
+                "let" => Tokens.Let,
+                "if" => Tokens.If,
+                "else" => Tokens.Else,
+                "return" => Tokens.Return,
+                "true" => Tokens.True,
+                "false" => Tokens.False,
+                string ident => Tokens.Ident(ident),
             };
         }
 
@@ -58,43 +58,43 @@ public class Lexer
         {
             '=' => PeekChar switch
             {
-                '=' => SkipPeek(Token.Equal),
-                _ => Token.Assign,
+                '=' => SkipPeek(Tokens.Equal),
+                _ => Tokens.Assign,
             },
             '!' => PeekChar switch
             {
-                '=' => SkipPeek(Token.NotEqual),
-                _ => Token.Bang,
+                '=' => SkipPeek(Tokens.NotEqual),
+                _ => Tokens.Bang,
             },
-            '-' => Token.Minus,
-            '+' => Token.Plus,
-            '/' => Token.Slash,
-            '*' => Token.Asterisk,
-            '<' => Token.LessThan,
-            '>' => Token.GreaterThan,
-            ';' => Token.Semicolon,
-            ',' => Token.Comma,
-            '(' => Token.LeftParen,
-            ')' => Token.RightParen,
-            '{' => Token.LeftBrace,
-            '}' => Token.RightBrace,
-            '\0' => Token.Eof,
-            _ => Token.Illegal(CurrentChar),
+            '-' => Tokens.Minus,
+            '+' => Tokens.Plus,
+            '/' => Tokens.Slash,
+            '*' => Tokens.Asterisk,
+            '<' => Tokens.LessThan,
+            '>' => Tokens.GreaterThan,
+            ';' => Tokens.Semicolon,
+            ',' => Tokens.Comma,
+            '(' => Tokens.LeftParen,
+            ')' => Tokens.RightParen,
+            '{' => Tokens.LeftBrace,
+            '}' => Tokens.RightBrace,
+            '\0' => Tokens.Eof,
+            _ => Tokens.Illegal(CurrentChar),
         };
-        
+
         ReadChar();
         return token;
     }
 
     private void ReadChar()
-    {        
+    {
         _position++;
     }
 
     private string ReadIdentifier()
     {
         int position = _position;
-        
+
         while (char.IsAsciiLetterOrDigit(CurrentChar) || CurrentChar == '_')
         {
             ReadChar();
