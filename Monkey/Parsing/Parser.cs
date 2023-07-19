@@ -2,9 +2,6 @@ using Monkey.Lexing;
 
 namespace Monkey.Parsing;
 
-using PrefixParse = Func<IExpression?>;
-using InfixParse = Func<IExpression, IExpression>;
-
 enum Precedence
 {
     Lowest,
@@ -21,17 +18,11 @@ public class Parser
     private readonly List<Token> _tokens;
     private int _position;
     private readonly List<string> _erros = new();
-    private readonly Dictionary<Type, PrefixParse> _prefixParseFns = new();
-    private readonly Dictionary<Type, InfixParse> _infixParseFns = new();
     
     public Parser(List<Token> tokens)
     {
         _tokens = tokens;
         _position = 0;
-        RegisterPrefix(typeof(IdentToken), ParseIdentifierExpression);
-        RegisterPrefix(typeof(IntToken), ParseIntegerExpression);
-        RegisterPrefix(typeof(BangToken), ParsePrefixExpression);
-        RegisterPrefix(typeof(MinusToken), ParsePrefixExpression);
     }
     
     private Token CurrentToken =>
@@ -114,17 +105,29 @@ public class Parser
         return expressionStatement;
     }
 
+    private IExpression? GetPrefixExpression(Token token)
+    {
+        return token switch
+        {
+            IdentToken => ParseIdentifierExpression(),
+            IntToken => ParseIntegerExpression(),
+            BangToken => ParsePrefixExpression(),
+            MinusToken => ParsePrefixExpression(),
+            _ => null
+        };
+    }
+
     private IExpression? ParseExpression(Precedence precedence)
     {
-        PrefixParse? prefix = _prefixParseFns.GetValueOrDefault(CurrentToken.GetType());
+        IExpression? prefixExpression = GetPrefixExpression(CurrentToken);
         
-        if (prefix is null)
+        if (prefixExpression is null)
         {
             _erros.Add($"No prefix parse function for {CurrentToken.GetType().Name} found");
             return null;
         } 
 
-        IExpression? leftExpression = prefix();
+        IExpression? leftExpression = prefixExpression;
 
         return leftExpression;
     }
@@ -173,15 +176,5 @@ public class Parser
         
         _erros.Add($"Expected next token to be {typeof(T).Name}, got {token} instead");
         return false;
-    }
-
-    private void RegisterPrefix(Type type, PrefixParse prefixParse)
-    {
-        _prefixParseFns.Add(type, prefixParse);
-    }
-    
-    private void RegisterInfix(Type type, InfixParse infixParse)
-    {
-        _infixParseFns.Add(type, infixParse);
     }
 }
